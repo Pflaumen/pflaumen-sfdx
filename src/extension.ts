@@ -12,10 +12,26 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// openWorkbench
 	vscode.commands.registerCommand('extension.openWorkbench', () => {
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Opening Workbench...');
-		let command = vscode.commands.executeCommand('extension.runCommand', 'sfdx dmg:workbench:open');
-		vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...',command);
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Done opening workbench...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel','Running Open Workbench...');
+		const util = require('util');
+		const exec = util.promisify(require('child_process').exec);
+		// TODO: Add progress indicator?
+		// TODO: Dynamic username
+		// TODO: add choice of saved orgs
+		async function lsWithGrep() {
+			try {
+				// const { stdout, stderr } = await exec('sfdx dmg:workbench:open -u resourceful-bear');
+				const { stdout, stderr } = await exec('sfdx dmg:workbench:open');
+				vscode.commands.executeCommand('extension.appendToOutputChannel',stdout);
+				console.log('stdout:', stdout);
+				console.log('stderr:', stderr);
+			}catch (err) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel',err);
+				vscode.window.showErrorMessage(''+err);
+				console.error(err);
+			}
+		}
+		vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...',lsWithGrep());
 	});
 
 	// retrieveSource
