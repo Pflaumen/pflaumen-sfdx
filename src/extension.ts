@@ -12,42 +12,85 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// openWorkbench
 	vscode.commands.registerCommand('extension.openWorkbench', () => {
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Running Open Workbench...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Running Open Workbench...');
 		const util = require('util');
 		const exec = util.promisify(require('child_process').exec);
 		// TODO: Add progress indicator?
 		// TODO: Dynamic username
 		// TODO: add choice of saved orgs
-		async function lsWithGrep() {
+		async function reallyOpenWorkbench(orgAlias : String) {
 			try {
-				// const { stdout, stderr } = await exec('sfdx dmg:workbench:open -u resourceful-bear');
-				const { stdout, stderr } = await exec('sfdx dmg:workbench:open');
-				vscode.commands.executeCommand('extension.appendToOutputChannel',stdout);
-				console.log('stdout:', stdout);
-				console.log('stderr:', stderr);
-			}catch (err) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel',err);
-				vscode.window.showErrorMessage(''+err);
+				let command = 'sfdx dmg:workbench:open -u '+ orgAlias;
+				const { stdout, stderr } = await exec(command);
+				vscode.commands.executeCommand('extension.appendToOutputChannel', stdout);
+				console.log('stdout: '+stdout);
+				console.log('stderr: '+stderr);
+
+			} catch (err) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', err);
+				vscode.window.showErrorMessage('' + err);
 				console.error(err);
 			}
 		}
-		vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...',lsWithGrep());
+
+		async function openWorkbench() {
+			try {
+				// const { stdout, stderr } = await exec('sfdx dmg:workbench:open -u resourceful-bear');
+				// const { stdout, stderr } = await exec('sfdx dmg:workbench:open');
+				const { stdout, stderr } = await exec('sfdx force:org:list --json');
+				vscode.commands.executeCommand('extension.appendToOutputChannel', stdout);
+				const output = JSON.parse(stdout);
+				const nonScratchOrgList = output.result.nonScratchOrgs;
+				const scratchOrgList = output.result.scratchOrgs;
+				selectOrg(nonScratchOrgList).then(orgAlias => {
+					console.log('orgAlias selected: ' + orgAlias);
+					if(orgAlias) {
+						reallyOpenWorkbench(orgAlias);
+					}
+
+				});
+				console.log('nonScratchOrgList: ' + JSON.stringify(nonScratchOrgList));
+				console.log('scratchOrgList: ' + JSON.stringify(scratchOrgList));
+
+			} catch (err) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', err);
+				vscode.window.showErrorMessage('' + err);
+				console.error(err);
+			}
+		}
+		
+		vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...', openWorkbench());
 	});
+
+	function selectOrg(nonScratchOrgList): Thenable<String | undefined> {
+		interface OrgQuickPickItem extends vscode.QuickPickItem {
+			alias: String;
+		}
+		const items: OrgQuickPickItem[] = nonScratchOrgList.map(org => {
+			return {
+				label: org.alias ? org.alias + ' - ' + org.username : org.username,
+				alias: org.alias
+			};
+		});
+		return vscode.window.showQuickPick(items, ).then(item => {
+			return item ? item.alias : undefined;
+		});
+	}
 
 	// retrieveSource
 	vscode.commands.registerCommand('extension.retrieveSource', () => {
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Retrieving Source...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Retrieving Source...');
 		let command = vscode.commands.executeCommand('extension.runCommand', 'sfdx dmg:source:retrieve -x ./manifest/package.xml');
-		vscode.window.setStatusBarMessage('WMP SFDX: Retrieving Source...',command);
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Done retrieving source...');
+		vscode.window.setStatusBarMessage('WMP SFDX: Retrieving Source...', command);
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Done retrieving source...');
 	});
 
 	// cleanup
 	vscode.commands.registerCommand('extension.cleanup', () => {
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Cleaning up...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Cleaning up...');
 		let command = vscode.commands.executeCommand('extension.runCommand', 'sfdx dmg:source:cleanup');
-		vscode.window.setStatusBarMessage('WMP SFDX: Cleaning up...',command);
-		vscode.commands.executeCommand('extension.appendToOutputChannel','Done cleaning up...');
+		vscode.window.setStatusBarMessage('WMP SFDX: Cleaning up...', command);
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Done cleaning up...');
 	});
 
 	// appendToOutputChannel
@@ -215,4 +258,4 @@ function ensureTerminalExists(): boolean {
 	return true;
 }
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() { }

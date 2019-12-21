@@ -44,7 +44,7 @@
 				{
 					"when": "resourceFilename == package.xml",
 					"command": "extension.retrieveSource",
-					"group": "zwmpSFDX@1"
+					"group": "z_wmpSFDX@1"
 				}
 			]
 		}
