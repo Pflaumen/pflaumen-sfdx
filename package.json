@@ -39,7 +39,6 @@
 					"group": "z_wmpSFDX@1"
 				}
 			],
-
 			"explorer/context": [
 				{
 					"when": "resourceFilename == package.xml",
@@ -47,7 +46,6 @@
 					"group": "z_wmpSFDX@1"
 				}
 			],
-
 			"touchBar": [
 				{
 					"when": "resourceFilename == package.xml",
