@@ -5,77 +5,108 @@ import * as vscode from 'vscode';
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	console.log('activated');
+	let globalState = context.globalState;
+
+	const util = require('util');
+	const exec = util.promisify(require('child_process').exec);
+
 	// start outputChannel for WMP SFDX to post to
-	let outputChannel = vscode.window.createOutputChannel(`WMP SFDX`);
+	let outputChannel = vscode.window.createOutputChannel('WMP SFDX');
 	// create a terminal for us to use
+	// TODO: Remove terminal and runCommand commands
 	vscode.commands.executeCommand('extension.createTerminal');
 
-	// openWorkbench
-	vscode.commands.registerCommand('extension.openWorkbench', () => {
-		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Running Open Workbench...');
-		const util = require('util');
-		const exec = util.promisify(require('child_process').exec);
-		// TODO: Add progress indicator?
-		// TODO: Dynamic username
-		// TODO: add choice of saved orgs
-		async function reallyOpenWorkbench(orgAlias : String) {
-			try {
-				let command = 'sfdx dmg:workbench:open -u '+ orgAlias;
-				const { stdout, stderr } = await exec(command);
-				vscode.commands.executeCommand('extension.appendToOutputChannel', stdout);
-				console.log('stdout: '+stdout);
-				console.log('stderr: '+stderr);
 
-			} catch (err) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', err);
-				vscode.window.showErrorMessage('' + err);
-				console.error(err);
-			}
+	async function openWorkbench(orgAlias : String) {
+		// vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Opening Workbench...');
+		try {
+			let command = 'sfdx dmg:workbench:open -u '+ orgAlias;
+			const { stdout, stderr } = await exec(command);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + stdout);
+			// console.log('stdout: '+stdout);
+			// console.log('stderr: '+stderr);
+
+		} catch (err) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + err);
+			vscode.window.showErrorMessage('' + err);
+			console.error(err);
 		}
+	}
 
-		async function openWorkbench() {
-			try {
-				// const { stdout, stderr } = await exec('sfdx dmg:workbench:open -u resourceful-bear');
-				// const { stdout, stderr } = await exec('sfdx dmg:workbench:open');
-				const { stdout, stderr } = await exec('sfdx force:org:list --json');
-				vscode.commands.executeCommand('extension.appendToOutputChannel', stdout);
-				const output = JSON.parse(stdout);
-				const nonScratchOrgList = output.result.nonScratchOrgs;
-				const scratchOrgList = output.result.scratchOrgs;
-				selectOrg(nonScratchOrgList).then(orgAlias => {
-					console.log('orgAlias selected: ' + orgAlias);
-					if(orgAlias) {
-						reallyOpenWorkbench(orgAlias);
-					}
+	async function getOrgList() {
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Refreshing Org List...');
+		try {
+			const { stdout, stderr } = await exec('sfdx force:org:list --json');
+			// vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + stdout);
+			const output = JSON.parse(stdout);
+			const nonScratchOrgList = output.result.nonScratchOrgs;
+			globalState.update('nonScratchOrgList',nonScratchOrgList);
+			const scratchOrgList = output.result.scratchOrgs;
+			globalState.update('scratchOrgList',scratchOrgList);
+			selectOrg(nonScratchOrgList).then(orgAlias => {
+				console.log('orgAlias selected: ' + orgAlias);
+				if(orgAlias) {
+					openWorkbench(orgAlias);
+				}
 
-				});
-				console.log('nonScratchOrgList: ' + JSON.stringify(nonScratchOrgList));
-				console.log('scratchOrgList: ' + JSON.stringify(scratchOrgList));
+			});
+			// console.log('nonScratchOrgList: ' + JSON.stringify(nonScratchOrgList));
+			// console.log('scratchOrgList: ' + JSON.stringify(scratchOrgList));
 
-			} catch (err) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', err);
-				vscode.window.showErrorMessage('' + err);
-				console.error(err);
-			}
+		} catch (err) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', err);
+			vscode.window.showErrorMessage('' + err);
+			console.error(err);
 		}
-		
-		vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...', openWorkbench());
-	});
+	}
 
 	function selectOrg(nonScratchOrgList): Thenable<String | undefined> {
 		interface OrgQuickPickItem extends vscode.QuickPickItem {
 			alias: String;
 		}
-		const items: OrgQuickPickItem[] = nonScratchOrgList.map(org => {
+		let items: OrgQuickPickItem[] = nonScratchOrgList.map(org => {
 			return {
 				label: org.alias ? org.alias + ' - ' + org.username : org.username,
 				alias: org.alias
 			};
 		});
-		return vscode.window.showQuickPick(items, ).then(item => {
-			return item ? item.alias : undefined;
+		items.push(
+			{
+				label: 'Refresh Org List',
+				alias: 'refresh'
+			}
+		);
+		return vscode.window.showQuickPick(items).then(item => {
+			console.log('item alias: '+item?.alias);
+			if(item?.alias === 'refresh') {
+				getOrgList();
+			} else {
+				return item ? item.alias : undefined;
+			}
 		});
 	}
+
+	// openWorkbench
+	vscode.commands.registerCommand('extension.openWorkbench', () => {
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Checking Org List...');
+		// TODO: Add progress indicator?
+		console.log('got here 1');
+		if(globalState.get('nonScratchOrgList')) {
+			console.log('got here 2');
+			console.log('nonScratchOrgList: '+globalState.get('nonScratchOrgList'));
+			selectOrg(globalState.get('nonScratchOrgList')).then(orgAlias => {
+				console.log('orgAlias selected: ' + orgAlias);
+				if(orgAlias) {
+					vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...', openWorkbench(orgAlias));
+				}
+
+			});
+		} else {
+			console.log('got here 3');
+			vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList());
+		}
+	});
 
 	// retrieveSource
 	vscode.commands.registerCommand('extension.retrieveSource', () => {
