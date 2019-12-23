@@ -28,18 +28,14 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 
 ## Invocation Methods
 
-#### Command Palette
-<img src="images/commandPalette.png" width="200px" />
+#### Command Palette (Cmd + Shift + P)
+<img src="images/commandPalette.png" width="250px" />
 
-#### Editor (when `manifest/package.xml` is selected)
+#### Editor (when `package.xml` is selected)
 <img src="images/editor.png" width="500px" />
 
-#### Explorer (when `manifest/package.xml` is selected)
+#### Explorer (when `package.xml` is selected)
 <img src="images/explorer.png" width="500px" />
-
-## Notifications
-Notifications in the Status Bar and Output Panel keep you up to date better than Facebook.
-<img src="images/notifications1.png" width="500px" />
 
 <!-- ## Features
 
