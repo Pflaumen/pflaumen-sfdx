@@ -1,15 +1,45 @@
 # WMP SFDX
 This extension allows for easy access and use of [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin) commands via the Command Palette, Explorer, and Editor.
-- [Open Workbench](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgworkbenchopen--s-string--t-string--r-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-- [Retrieve Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourceretrieve--x-string--n--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-- [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcecleanup---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
 ## Installation
-[Download](https://github.com/Pflaumen/sfdx/raw/master/versions/wmp-sfdx-0.0.1.vsix.zip)
+1. Install [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin)
+
+2. [Download Extension](https://github.com/Pflaumen/sfdx/raw/master/versions/wmp-sfdx-0.0.1.vsix.zip)
+
+3. In VS Code's Command Palette, search for and select `Extensions: Install from VSIX...`, and select the downloaded file.
+
+## Commands
+
+### WMP SFDX: Retrieve Source
+Runs [Retrieve Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourceretrieve--x-string--n--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+
+### WMP SFDX: Cleanup Source
+Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcecleanup---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+
+### WMP SFDX: Open Workbench
+1. Presents a list of currently enabled orgs; retrieved via `sfdx force:org:list`
+<img src="images/orgList.png" width="500px" />
+
+    a. Last used org for quick access
+
+    b. Refresh org list if a new org was recently added
+
+2. Runs [Open Workbench](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgworkbenchopen--s-string--t-string--r-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+
+## Invocation Methods
+
+#### Command Palette
+<img src="images/commandPalette.png" width="200px" />
+
+#### Editor (when `manifest/package.xml` is selected)
+<img src="images/editor.png" width="500px" />
+
+#### Explorer (when `manifest/package.xml` is selected)
+<img src="images/explorer.png" width="500px" />
 
 ## Notifications
 Notifications in the Status Bar and Output Panel keep you up to date better than Facebook.
-<img src="images/notifications1.png" width="600px" />
+<img src="images/notifications1.png" width="500px" />
 
 <!-- ## Features
 
