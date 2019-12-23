@@ -6,6 +6,7 @@
 	"engines": {
 		"vscode": "^1.41.0"
 	},
+	"publisher" : "WestMonroePartners",
 	"categories": [
 		"Other"
 	],
@@ -76,5 +77,8 @@
 		"typescript": "^3.6.4",
 		"tslint": "^5.20.0",
 		"vscode-test": "^1.2.2"
+	},
+	"dependencies": {
+		"vsce": "^1.71.0"
 	}
 }
