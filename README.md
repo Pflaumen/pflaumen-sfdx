@@ -7,6 +7,9 @@ Allows for easy access and used of dmg sfdx plugin commands, including:
 - Retrieve Source
 - Cleanup Source
 
+# Notifications
+![Step 1](images/notifications1.png)
+
 <!-- ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
