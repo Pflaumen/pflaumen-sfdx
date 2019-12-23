@@ -1,14 +1,15 @@
-# wmp-sfdx README
+# WMP SFDX
+This extension allows for easy access and use of [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin) commands via the Command Palette, Explorer, and Editor.
+- [Open Workbench](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgworkbenchopen--s-string--t-string--r-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+- [Retrieve Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourceretrieve--x-string--n--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+- [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcecleanup---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-Allows for easy access and used of dmg sfdx plugin commands, including:
-- Open Workbench
-    - Select from SFDX authorized orgs
-    - Saves 'Last Used'
-- Retrieve Source
-- Cleanup Source
+## Installation
+[Download](./versions/wmp-sfdx-0.0.1.vsix.zip)
 
-# Notifications
-![Step 1](images/notifications1.png)
+## Notifications
+Notifications in the Status Bar and Output Panel keep you up to date better than Facebook.
+<img src="images/notifications1.png" width="600px" />
 
 <!-- ## Features
 
