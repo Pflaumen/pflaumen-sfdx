@@ -1,9 +1,15 @@
 {
 	"name": "wmp-sfdx",
 	"displayName": "WMP SFDX",
-	"description": "SFDX App",
+	"description": "Allows for easy access and use of sfdx-dmg-plugin commands via the Command Palette, Explorer, and Editor.",
+	"bugs": {
+		"url": "https://github.com/Pflaumen/sfdx/issues"
+	},
+	"homepage": "https://github.com/Pflaumen/sfdx/blob/master/README.md",
 	"repository": {
+		"type": "git",
 		"url": "https://github.com/Pflaumen/sfdx.git"
+
 	},
 	"version": "0.0.1",
 	"engines": {
