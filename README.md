@@ -1,8 +1,13 @@
 # wmp-sfdx README
 
-This is the README for your extension "wmp-sfdx". After writing up a brief description, we recommend including the following sections.
+Allows for easy access and used of dmg sfdx plugin commands, including:
+- Open Workbench
+    - Select from SFDX authorized orgs
+    - Saves 'Last Used'
+- Retrieve Source
+- Cleanup Source
 
-## Features
+<!-- ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
 
@@ -62,4 +67,4 @@ Added features X, Y, and Z.
 * [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
 * [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
 
-**Enjoy!**
+**Enjoy!** -->
