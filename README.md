@@ -5,7 +5,7 @@ This extension allows for easy access and use of [sfdx-dmg-plugin](https://githu
 - [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcecleanup---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
 ## Installation
-[Download](./versions/wmp-sfdx-0.0.1.vsix.zip)
+[Download](https://github.com/Pflaumen/sfdx/raw/master/versions/wmp-sfdx-0.0.1.vsix.zip)
 
 ## Notifications
 Notifications in the Status Bar and Output Panel keep you up to date better than Facebook.
