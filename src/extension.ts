@@ -15,12 +15,11 @@ export function activate(context: vscode.ExtensionContext) {
 	let outputChannel = vscode.window.createOutputChannel('WMP SFDX');
 	const fsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
 
-	// if (!globalState.get('combinedList')) {
+	if (!globalState.get('combinedList')) {
 		vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList(false));
-	// }
+	}
 
 	async function openWorkbench(orgAlias: String) {
-		console.log('running openWorkbench');
 		try {
 			let command = 'sfdx dmg:workbench:open -u ' + orgAlias;
 			const { stdout, stderr } = await exec(command);
@@ -36,39 +35,10 @@ export function activate(context: vscode.ExtensionContext) {
 		try {
 			const { stdout, stderr } = await exec('sfdx force:org:list --json');
 			const output = JSON.parse(stdout);
-			let combinedList = [];
-
-			if (globalState.get('lastUsedOrg')) {
-				const lastUsedOrg: any = globalState.get('lastUsedOrg');
-				if(lastUsedOrg.alias !== 'refresh') {
-					combinedList.push(
-						{
-							label : lastUsedOrg.label,
-							alias: lastUsedOrg.alias,
-							username: lastUsedOrg.username,
-							lastUsed: true
-						}
-					);
-				}
-			}
-
-			const nonScratchOrgList = output.result.nonScratchOrgs;
-			globalState.update('nonScratchOrgList', nonScratchOrgList);
-			for (let i = 0; i < nonScratchOrgList.length; i++) {
-				nonScratchOrgList[i].orgType = 'non';
-				nonScratchOrgList[i].lastUsed = false;
-				combinedList.push(nonScratchOrgList[i]);
-			}
-			console.log('nonScratchOrgList: ' + JSON.stringify(nonScratchOrgList));
-			const scratchOrgList = output.result.scratchOrgs;
-			globalState.update('scratchOrgList', scratchOrgList);
-			for (let i = 0; i < scratchOrgList.length; i++) {
-				scratchOrgList[i].orgType = 'scratch';
-				scratchOrgList[i].lastUsed = false;
-				combinedList.push(scratchOrgList[i]);
-			}
-			console.log('scratchOrgList: ' + JSON.stringify(scratchOrgList));
-			globalState.update('combinedList', combinedList);
+			globalState.update('nonScratchOrgList', output.result.nonScratchOrgs);
+			globalState.update('scratchOrgList', output.result.scratchOrgs);
+			buildOrgList();
+			let combinedList: any = globalState.get('combinedList');
 			if (showOrgSelect) {
 				selectOrg(combinedList).then(orgAlias => {
 					if (orgAlias && orgAlias !== 'refresh') {
@@ -101,19 +71,51 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 		);
 		return vscode.window.showQuickPick(items).then(item => {
-				if(item) {
-					let showOrgSelect = true;
-					for(let i=0;i<combinedList.length;i++) {
-						if(combinedList[i].alias === item.alias  && item.alias !== 'refresh') {
-							showOrgSelect = false;
-							globalState.update('lastUsedOrg', combinedList[i]);
-							console.log('set lastUsedOrg: '+JSON.stringify(item));
-						}
+			if(item) {
+				let showOrgSelect = true;
+				for(let i=0;i<combinedList.length;i++) {
+					if(combinedList[i].alias === item.alias  && item.alias !== 'refresh') {
+						showOrgSelect = false;
+						globalState.update('lastUsedOrg', combinedList[i]);
 					}
-					vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList(showOrgSelect));
 				}
-				return item ? item.alias : undefined;
+				buildOrgList();
+			}
+			return item ? item.alias : undefined;
 		});
+	}
+
+	function buildOrgList() {
+		let combinedList = [];
+		if (globalState.get('lastUsedOrg')) {
+			const lastUsedOrg: any = globalState.get('lastUsedOrg');
+			if(lastUsedOrg.alias !== 'refresh') {
+				combinedList.push(
+					{
+						label : lastUsedOrg.label,
+						alias: lastUsedOrg.alias,
+						username: lastUsedOrg.username,
+						lastUsed: true
+					}
+				);
+			}
+		}
+		const nonScratchOrgList: any = globalState.get('nonScratchOrgList');
+		for (let i = 0; i < nonScratchOrgList.length; i++) {
+			nonScratchOrgList[i].orgType = 'non';
+			nonScratchOrgList[i].lastUsed = false;
+			combinedList.push(nonScratchOrgList[i]);
+		}
+		// console.log('nonScratchOrgList: ' + JSON.stringify(nonScratchOrgList));
+		const scratchOrgList: any = globalState.get('scratchOrgList');
+		for (let i = 0; i < scratchOrgList.length; i++) {
+			scratchOrgList[i].orgType = 'scratch';
+			scratchOrgList[i].lastUsed = false;
+			combinedList.push(scratchOrgList[i]);
+		}
+		// console.log('scratchOrgList: ' + JSON.stringify(scratchOrgList));
+
+		globalState.update('combinedList', combinedList);
 	}
 
 	async function retrieveSource() {
@@ -144,12 +146,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// openWorkbench
 	vscode.commands.registerCommand('extension.openWorkbench', () => {
-		vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Checking Org List...');
+		// vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Checking Org List...');
 		// TODO: Add progress indicator?
 		if (globalState.get('combinedList')) {
 			selectOrg(globalState.get('combinedList')).then(orgAlias => {
 				if (orgAlias && orgAlias !== 'refresh') {
 					vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...', openWorkbench(orgAlias));
+				} else if(orgAlias === 'refresh') {
+					vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList(true));
 				}
 
 			});
@@ -174,28 +178,5 @@ export function activate(context: vscode.ExtensionContext) {
 		outputChannel.show(true);
 	}));
 }
-// function selectTerminal(): Thenable<vscode.Terminal | undefined> {
-// 	interface TerminalQuickPickItem extends vscode.QuickPickItem {
-// 		terminal: vscode.Terminal;
-// 	}
-// 	const terminals = <vscode.Terminal[]>(<any>vscode.window).terminals;
-// 	const items: TerminalQuickPickItem[] = terminals.map(t => {
-// 		return {
-// 			label: `name: ${t.name}`,
-// 			terminal: t
-// 		};
-// 	});
-// 	return vscode.window.showQuickPick(items).then(item => {
-// 		return item ? item.terminal : undefined;
-// 	});
-// }
-
-// function ensureTerminalExists(): boolean {
-// 	if ((<any>vscode.window).terminals.length === 0) {
-// 		vscode.window.showErrorMessage('No active terminals');
-// 		return false;
-// 	}
-// 	return true;
-// }
 // this method is called when your extension is deactivated
 export function deactivate() { }
