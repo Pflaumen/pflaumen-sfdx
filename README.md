@@ -31,10 +31,10 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 #### Command Palette (Cmd + Shift + P)
 <img src="images/commandPalette.png" width="250px" />
 
-#### Editor (when `package.xml` is selected)
+#### Right Click Editor (when `package.xml` is selected)
 <img src="images/editor.png" width="500px" />
 
-#### Explorer (when `package.xml` is selected)
+#### Right Click Explorer (when `package.xml` is selected)
 <img src="images/explorer.png" width="500px" />
 
 #### Touchbar
