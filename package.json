@@ -30,11 +30,19 @@
 		"commands": [
 			{
 				"command": "extension.openWorkbench",
-				"title": "WMP SFDX: Open Workbench"
+				"title": "WMP SFDX: Open Workbench",
+				"icon": {
+					"light": "./images/workbench.png",
+					"dark": "./images/workbench.png"
+				}
 			},
 			{
 				"command": "extension.retrieveSource",
-				"title": "WMP SFDX: Retrieve Source"
+				"title": "WMP SFDX: Retrieve Source",
+				"icon": {
+					"light": "./images/refresh.png",
+					"dark": "./images/refresh.png"
+				}
 			},
 			{
 				"command": "extension.cleanup",
@@ -58,13 +66,11 @@
 			],
 			"touchBar": [
 				{
-					"when": "resourceFilename == package.xml",
-					"command": "extension.retrieveSource",
-					"group": "z_wmpSFDX@1"
+					"command": "extension.openWorkbench"
 				},
 				{
-					"command": "extension.openWorkbench",
-					"group": "z_wmpSFDX@1"
+					"when": "resourceFilename == package.xml",
+					"command": "extension.retrieveSource"
 				}
 			]
 		}

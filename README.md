@@ -37,6 +37,18 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 #### Explorer (when `package.xml` is selected)
 <img src="images/explorer.png" width="500px" />
 
+#### Touchbar
+#### (when `package.xml` is selected)
+* Open Workbench
+* Retrieve Source
+
+<img src="images/touchbar1.png" width="500px" />
+
+#### (all other files)
+* Open Workbench
+
+<img src="images/touchbar2.png" width="500px" />
+
 <!-- ## Features
 
 Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
