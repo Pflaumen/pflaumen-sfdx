@@ -18,6 +18,7 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 
 ### WMP SFDX: Open Workbench
 1. Presents a list of currently enabled orgs; retrieved via `sfdx force:org:list`
+
 <img src="images/orgList.png" width="500px" />
 
     a. Last used org for quick access
@@ -48,6 +49,12 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 * Open Workbench
 
 <img src="images/touchbar2.png" width="500px" />
+
+## Settings
+### Workbench
+#### URL
+* Set the URL for the Workbench instance you wish to use, either official SF or custom hosted. Defaults to https://wmpbench.herokuapp.com/.
+
 
 <!-- ## Features
 

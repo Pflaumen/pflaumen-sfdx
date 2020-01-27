@@ -21,7 +21,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	async function openWorkbench(orgAlias: String) {
 		try {
-			let command = 'sfdx dmg:workbench:open -u ' + orgAlias;
+			let targetUrl = vscode.workspace.getConfiguration('wmp-sfdx.workbench').get('URL');
+			let command = 'sfdx dmg:workbench:open -u ' + orgAlias + ' -t ' + targetUrl;
 			const { stdout, stderr } = await exec(command);
 			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + stdout);
 		} catch (err) {

@@ -73,6 +73,17 @@
 					"command": "extension.retrieveSource"
 				}
 			]
+		},
+		"configuration": {
+			"title": "WMP SFDX",
+			"type": "object",
+			"properties" : {
+				"wmp-sfdx.workbench.URL": {
+					"type": "string",
+					"default": "https://wmpbench.herokuapp.com/",
+					"description": "Workbench provider URL (custom hosted or standard SF)."
+				}
+			}
 		}
 	},
 	"scripts": {
