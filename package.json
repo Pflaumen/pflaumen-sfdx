@@ -1,21 +1,21 @@
 {
-	"name": "wmp-sfdx",
-	"displayName": "WMP SFDX",
+	"name": "pflaumen-sfdx",
+	"displayName": "Pflaumen SFDX",
 	"description": "Allows for easy access and use of sfdx-dmg-plugin commands via the Command Palette, Explorer, and Editor.",
 	"bugs": {
-		"url": "https://github.com/wmpcx/wmp-sfdx/issues"
+		"url": "https://github.com/Pflaumen/sfdx/issues"
 	},
-	"homepage": "https://github.com/wmpcx/wmp-sfdx/blob/master/README.md",
+	"homepage": "https://github.com/Pflaumen/sfdx/blob/master/README.md",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/wmpcx/wmp-sfdx.git"
+		"url": "https://github.com/Pflaumen/sfdx.git"
 
 	},
-	"version": "0.0.1",
+	"version": "0.1.1",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
-	"publisher" : "WestMonroePartners",
+	"publisher" : "Pflaumen",
 	"categories": [
 		"Other"
 	],
@@ -30,7 +30,7 @@
 		"commands": [
 			{
 				"command": "extension.openWorkbench",
-				"title": "WMP SFDX: Open Workbench",
+				"title": "P SFDX: Open Workbench",
 				"icon": {
 					"light": "./images/workbench.png",
 					"dark": "./images/workbench.png"
@@ -38,7 +38,7 @@
 			},
 			{
 				"command": "extension.retrieveSource",
-				"title": "WMP SFDX: Retrieve Source",
+				"title": "P SFDX: Retrieve Source",
 				"icon": {
 					"light": "./images/refresh.png",
 					"dark": "./images/refresh.png"
@@ -46,7 +46,7 @@
 			},
 			{
 				"command": "extension.cleanup",
-				"title": "WMP SFDX: Cleanup"
+				"title": "P SFDX: Cleanup"
 			}
 		],
 		"menus": {
@@ -54,14 +54,14 @@
 				{
 					"when": "resourceFilename == package.xml",
 					"command": "extension.retrieveSource",
-					"group": "z_wmpSFDX@1"
+					"group": "z_PSFDX@1"
 				}
 			],
 			"explorer/context": [
 				{
 					"when": "resourceFilename == package.xml",
 					"command": "extension.retrieveSource",
-					"group": "z_wmpSFDX@1"
+					"group": "z_PSFDX@1"
 				}
 			],
 			"touchBar": [
@@ -75,10 +75,10 @@
 			]
 		},
 		"configuration": {
-			"title": "WMP SFDX",
+			"title": "Pflaumen SFDX",
 			"type": "object",
 			"properties" : {
-				"wmp-sfdx.workbench.URL": {
+				"pflaumen-sfdx.workbench.URL": {
 					"type": "string",
 					"default": "https://wmpbench.herokuapp.com/",
 					"description": "Workbench provider URL (custom hosted or standard SF)."

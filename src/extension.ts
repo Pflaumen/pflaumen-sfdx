@@ -11,28 +11,28 @@ export function activate(context: vscode.ExtensionContext) {
 	const util = require('util');
 	const exec = util.promisify(require('child_process').exec);
 
-	// start outputChannel for WMP SFDX to post to
-	let outputChannel = vscode.window.createOutputChannel('WMP SFDX');
+	// start outputChannel for Pflaumen SFDX to post to
+	let outputChannel = vscode.window.createOutputChannel('Pflaumen SFDX');
 	const fsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : null;
 
 	if (!globalState.get('combinedList')) {
-		vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList(false));
+		vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(false));
 	}
 
 	async function openWorkbench(orgAlias: String) {
 		try {
-			let targetUrl = vscode.workspace.getConfiguration('wmp-sfdx.workbench').get('URL');
+			let targetUrl = vscode.workspace.getConfiguration('pflaumen-sfdx.workbench').get('URL');
 			let command = 'sfdx dmg:workbench:open -u ' + orgAlias + ' -t ' + targetUrl;
 			const { stdout, stderr } = await exec(command);
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + stdout);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
 		} catch (err) {
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + err);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
 			vscode.window.showErrorMessage('' + err);
 		}
 	}
 
 	async function getOrgList(showOrgSelect: boolean) {
-		vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Refreshing Org List...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Refreshing Org List...');
 		try {
 			const { stdout, stderr } = await exec('sfdx force:org:list --json');
 			const output = JSON.parse(stdout);
@@ -43,11 +43,11 @@ export function activate(context: vscode.ExtensionContext) {
 			if (showOrgSelect) {
 				selectOrg(combinedList).then(orgAlias => {
 					if (orgAlias && orgAlias !== 'refresh') {
-						vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...', openWorkbench(orgAlias));
+						vscode.window.setStatusBarMessage('Pflaumen SFDX: Opening Workbench...', openWorkbench(orgAlias));
 					}
 				});
 			}
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Refreshing Org List Finished');
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Refreshing Org List Finished');
 		} catch (err) {
 			vscode.commands.executeCommand('extension.appendToOutputChannel', err);
 			vscode.window.showErrorMessage('' + err);
@@ -120,57 +120,57 @@ export function activate(context: vscode.ExtensionContext) {
 	}
 
 	async function retrieveSource() {
-		vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Retrieving Source...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Retrieving Source...');
 		try {
 			let command = 'sfdx dmg:source:retrieve -x ./manifest/package.xml';
 			const { stdout, stderr } = await exec(command, { cwd: fsPath });
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + stdout);
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Retrieving Source Finished');
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Retrieving Source Finished');
 		} catch (err) {
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + err);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
 			vscode.window.showErrorMessage('' + err);
 		}
 	}
 
 	async function cleanup() {
-		vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Cleaning Up...');
+		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Cleaning Up...');
 		try {
 			let command = 'sfdx dmg:source:cleanup';
 			const { stdout, stderr } = await exec(command, { cwd: fsPath });
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + stdout);
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Cleaning Up Finished');
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Cleaning Up Finished');
 		} catch (err) {
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: ' + err);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
 			vscode.window.showErrorMessage('' + err);
 		}
 	}
 
 	// openWorkbench
 	vscode.commands.registerCommand('extension.openWorkbench', () => {
-		// vscode.commands.executeCommand('extension.appendToOutputChannel', 'WMP SFDX: Checking Org List...');
+		// vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Checking Org List...');
 		// TODO: Add progress indicator?
 		if (globalState.get('combinedList')) {
 			selectOrg(globalState.get('combinedList')).then(orgAlias => {
 				if (orgAlias && orgAlias !== 'refresh') {
-					vscode.window.setStatusBarMessage('WMP SFDX: Opening Workbench...', openWorkbench(orgAlias));
+					vscode.window.setStatusBarMessage('Pflaumen SFDX: Opening Workbench...', openWorkbench(orgAlias));
 				} else if(orgAlias === 'refresh') {
-					vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList(true));
+					vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(true));
 				}
 
 			});
 		} else {
-			vscode.window.setStatusBarMessage('WMP SFDX: Refreshing Org List...', getOrgList(true));
+			vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(true));
 		}
 	});
 
 	// retrieveSource
 	vscode.commands.registerCommand('extension.retrieveSource', () => {
-		vscode.window.setStatusBarMessage('WMP SFDX: Retrieving Source...', retrieveSource());
+		vscode.window.setStatusBarMessage('Pflaumen SFDX: Retrieving Source...', retrieveSource());
 	});
 
 	// cleanup
 	vscode.commands.registerCommand('extension.cleanup', () => {
-		vscode.window.setStatusBarMessage('WMP SFDX: Cleaning Up...', cleanup());
+		vscode.window.setStatusBarMessage('Pflaumen SFDX: Cleaning Up...', cleanup());
 	});
 
 	// appendToOutputChannel

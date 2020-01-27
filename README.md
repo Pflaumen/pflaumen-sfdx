@@ -1,22 +1,26 @@
-# WMP SFDX
+# Pflaumen SFDX
 This VS Code extension allows for easy access and use of [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin) commands via the Command Palette, Explorer, and Editor.
 
 ## Installation
 1. Install [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin)
 
-2. [Download Extension](https://github.com/wmpcx/wmp-sfdx/blob/master/versions/wmp-sfdx-0.0.1.vsix.zip)
+2. Install this extension
 
-3. In VS Code's Command Palette, search for and select `Extensions: Install from VSIX...`, and select the downloaded file.
+3. Reload VSCode
+
+<!-- 2. [Download Extension](https://github.com/Pflaumen/sfdx/raw/master/versions/wmp-sfdx-0.0.1.vsix.zip)
+
+3. In VS Code's Command Palette, search for and select `Extensions: Install from VSIX...`, and select the downloaded file. -->
 
 ## Commands
 
-### WMP SFDX: Retrieve Source
+### Pflaumen SFDX: Retrieve Source
 Runs [Retrieve Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourceretrieve--x-string--n--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal) using the package at `/manifest/package.xml`
 
-### WMP SFDX: Cleanup Source
+### Pflaumen SFDX: Cleanup Source
 Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcecleanup---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-### WMP SFDX: Open Workbench
+### Pflaumen SFDX: Open Workbench
 1. Presents a list of currently enabled orgs; retrieved via `sfdx force:org:list`
 
 <img src="images/orgList.png" width="500px" />
