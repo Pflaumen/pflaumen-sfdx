@@ -4,7 +4,7 @@ This VS Code extension allows for easy access and use of [sfdx-dmg-plugin](https
 ## Installation
 1. Install [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin)
 
-2. [Download Extension](https://github.com/Pflaumen/sfdx/raw/master/versions/wmp-sfdx-0.0.1.vsix.zip)
+2. [Download Extension](https://github.com/wmpcx/wmp-sfdx/blob/master/versions/wmp-sfdx-0.0.1.vsix.zip)
 
 3. In VS Code's Command Palette, search for and select `Extensions: Install from VSIX...`, and select the downloaded file.
 
@@ -25,21 +25,21 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 
     b. Refresh org list if a new org was recently added
 
-2. Runs [Open Workbench](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgworkbenchopen--s-string--t-string--r-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+2. Runs [Open Workbench](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgworkbenchopen--s-string--t-string--r-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal) upon selection
 
 ## Invocation Methods
 
 #### Command Palette (Cmd + Shift + P)
 <img src="images/commandPalette.png" width="250px" />
 
-#### Right Click Editor (when `package.xml` is selected)
+#### Right Click Editor (when `package.xml` is the active tab)
 <img src="images/editor.png" width="500px" />
 
-#### Right Click Explorer (when `package.xml` is selected)
+#### Right Click Explorer (when `package.xml` is the active tab)
 <img src="images/explorer.png" width="500px" />
 
 #### Touchbar
-#### (when `package.xml` is selected)
+#### (when `package.xml` is the active tab)
 * Open Workbench
 * Retrieve Source
 
