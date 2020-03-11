@@ -23,7 +23,7 @@ export function activate(context: vscode.ExtensionContext) {
 		try {
 			let targetUrl = vscode.workspace.getConfiguration('pflaumen-sfdx.workbench').get('URL');
 			let command = 'sfdx dmg:workbench:open -u ' + orgAlias + ' -t ' + targetUrl;
-			const { stdout, stderr } = await exec(command);
+			const { stdout, stderr } = await exec(command, { cwd: fsPath });
 			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
 		} catch (err) {
 			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
@@ -36,18 +36,20 @@ export function activate(context: vscode.ExtensionContext) {
 		try {
 			const { stdout, stderr } = await exec('sfdx force:org:list --json');
 			const output = JSON.parse(stdout);
-			globalState.update('nonScratchOrgList', output.result.nonScratchOrgs);
-			globalState.update('scratchOrgList', output.result.scratchOrgs);
-			buildOrgList();
-			let combinedList: any = globalState.get('combinedList');
-			if (showOrgSelect) {
-				selectOrg(combinedList).then(orgAlias => {
-					if (orgAlias && orgAlias !== 'refresh') {
-						vscode.window.setStatusBarMessage('Pflaumen SFDX: Opening Workbench...', openWorkbench(orgAlias));
-					}
-				});
+			if(output) {
+				globalState.update('nonScratchOrgList', output.result.nonScratchOrgs);
+				globalState.update('scratchOrgList', output.result.scratchOrgs);
+				buildOrgList();
+				let combinedList: any = globalState.get('combinedList');
+				if (showOrgSelect) {
+					selectOrg(combinedList).then(orgAlias => {
+						if (orgAlias && orgAlias !== 'refresh') {
+							vscode.window.setStatusBarMessage('Pflaumen SFDX: Opening Workbench...', openWorkbench(orgAlias));
+						}
+					});
+				}
 			}
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Refreshing Org List Finished');
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Refreshing Org List Finished');
 		} catch (err) {
 			vscode.commands.executeCommand('extension.appendToOutputChannel', err);
 			vscode.window.showErrorMessage('' + err);
@@ -132,6 +134,23 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 	}
 
+	async function signOut(orgAlias: String) {
+		try {
+			let command = 'sfdx force:auth:logout -u ' + orgAlias + ' -p';
+			const { stdout, stderr } = await exec(command, { cwd: fsPath });
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
+			vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(false));
+
+			// clear the last used org
+			if (globalState.get('lastUsedOrg')) {
+				globalState.update('lastUsedOrg', null);
+			}
+		} catch (err) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
+			vscode.window.showErrorMessage('' + err);
+		}
+	}
+
 	async function cleanup() {
 		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Cleaning Up...');
 		try {
@@ -166,6 +185,24 @@ export function activate(context: vscode.ExtensionContext) {
 	// retrieveSource
 	vscode.commands.registerCommand('extension.retrieveSource', () => {
 		vscode.window.setStatusBarMessage('Pflaumen SFDX: Retrieving Source...', retrieveSource());
+	});
+
+	// signOut
+	vscode.commands.registerCommand('extension.signOut', () => {
+		// vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Checking Org List...');
+		// TODO: Add progress indicator?
+		if (globalState.get('combinedList')) {
+			selectOrg(globalState.get('combinedList')).then(orgAlias => {
+				if (orgAlias && orgAlias !== 'refresh') {
+					vscode.window.setStatusBarMessage('Pflaumen SFDX: Signing out...', signOut(orgAlias));
+				} else if(orgAlias === 'refresh') {
+					vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(true));
+				}
+
+			});
+		} else {
+			vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(true));
+		}
 	});
 
 	// cleanup

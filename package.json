@@ -22,6 +22,7 @@
 	"activationEvents": [
 		"onCommand:extension.openWorkbench",
 		"onCommand:extension.retrieveSource",
+		"onCommand:extension.signOut",
 		"onCommand:extension.cleanup",
 		"workspaceContains:sfdx-project.json"
 	],
@@ -43,6 +44,10 @@
 					"light": "./images/refresh.png",
 					"dark": "./images/refresh.png"
 				}
+			},
+			{
+				"command": "extension.signOut",
+				"title": "P SFDX: Sign Out of Org"
 			},
 			{
 				"command": "extension.cleanup",

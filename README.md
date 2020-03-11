@@ -31,6 +31,17 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 
 2. Runs [Open Workbench](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgworkbenchopen--s-string--t-string--r-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal) upon selection
 
+### Pflaumen SFDX: Sign Out of Org
+1. Presents a list of currently enabled orgs; retrieved via `sfdx force:org:list`
+
+<img src="images/orgList.png" width="500px" />
+
+    a. Last used org for quick access
+
+    b. Refresh org list if a new org was recently added
+
+2. Runs `sfdx force:auth:logout -u {orgAlias}` upon selection
+
 ## Invocation Methods
 
 #### Command Palette (Cmd + Shift + P)
