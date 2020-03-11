@@ -1,9 +1,9 @@
 # Change Log
 
-All notable changes to the "wmp-sfdx" extension will be documented in this file.
+## 0.2.0
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+- Added `P SFDX: Sign Out of Org` [Sign Out of Org](/README.md#pflaumen-sfdx-sign-out-of-org)
 
-## [Unreleased]
+## 0.1.0
 
 - Initial release
