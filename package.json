@@ -9,13 +9,12 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Pflaumen/sfdx.git"
-
 	},
-	"version": "0.1.1",
+	"version": "0.2.0",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
-	"publisher" : "Pflaumen",
+	"publisher": "Pflaumen",
 	"categories": [
 		"Other"
 	],
@@ -82,7 +81,7 @@
 		"configuration": {
 			"title": "Pflaumen SFDX",
 			"type": "object",
-			"properties" : {
+			"properties": {
 				"pflaumen-sfdx.workbench.URL": {
 					"type": "string",
 					"default": "https://wmpbench.herokuapp.com/",
