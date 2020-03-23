@@ -1,7 +1,7 @@
 {
 	"name": "pflaumen-sfdx",
 	"displayName": "Pflaumen SFDX",
-	"description": "Allows for easy access and use of sfdx-dmg-plugin commands via the Command Palette, Explorer, and Editor.",
+	"description": "Allows for easy access and use of sfdx-dmg-plugin and other handy commands via the Command Palette, Explorer, and Editor.",
 	"bugs": {
 		"url": "https://github.com/Pflaumen/sfdx/issues"
 	},
