@@ -1,5 +1,5 @@
 # Pflaumen SFDX
-This VS Code extension allows for easy access and use of [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin) commands via the Command Palette, Explorer, and Editor.
+This VS Code extension allows for easy access and use of [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin) and other handy commands via the Command Palette, Explorer, and Editor.
 
 ## Installation
 1. Install [sfdx-dmg-plugin](https://github.com/dmgerow/sfdx-dmg-plugin)
