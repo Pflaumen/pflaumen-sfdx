@@ -31,7 +31,7 @@
 		"commands": [
 			{
 				"command": "extension.soqlQueryAll",
-				"title": "P SFDX: SOQL on Selected Text",
+				"title": "P SFDX: SOQL SELECT * on Highlighted Text",
 				"icon": {
 					"light": "./images/soql.png",
 					"dark": "./images/soql.png"
