@@ -2,6 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { globalAgent } from 'http';
+import { code } from './lib/getFieldsApex';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -17,6 +18,51 @@ export function activate(context: vscode.ExtensionContext) {
 
 	if (!globalState.get('combinedList')) {
 		vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(false));
+	}
+
+	async function soqlQueryAll() {
+		try {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: starting...');
+			let editor = vscode.window.activeTextEditor;
+			let selection = editor?.selection;
+			let text = editor?.document.getText(selection).toUpperCase();
+			if(text?.match(/SELECT.*FROM.*/) === null) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Invalid string: '+text);
+				return;
+			}
+			let afterFrom = text?.split('FROM')[1];
+			let objName = afterFrom?.split('WHERE')[0].trim();
+			let qualifiers = afterFrom?.split('WHERE')[1]?.trim();
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Received: '+objName+' '+qualifiers);
+			let fullApexCode = 'echo "String sObjectName = \''+objName+'\';'+code+'"';
+			let runTmpApexCmd = fullApexCode+' | sfdx force:apex:execute | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: running ' + runTmpApexCmd);
+			const { runStdout, runStderr } = await exec(runTmpApexCmd, { cwd: fsPath });
+			if(runStderr) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: error:' + runStderr);
+				return;
+			}
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + runStdout);
+			let sObjectFields = JSON.parse(runStdout);
+			let dynamicSoqlQuery = 'SELECT ';
+			for(let field in sObjectFields[objName!]) {
+				dynamicSoqlQuery += field + ', ';
+			}
+			dynamicSoqlQuery = dynamicSoqlQuery.slice(0, -1);
+			dynamicSoqlQuery += ' FROM '+objName;
+			if(qualifiers) {
+				dynamicSoqlQuery += ' WHERE '+qualifiers;
+			}
+			let runSoqlCmd = 'sfdx force:data:soql:query -q "'+dynamicSoqlQuery+'"';
+			const { soqlStdout, soqlStderr } = await exec(runSoqlCmd, { cwd: fsPath });
+			if(soqlStderr) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + soqlStderr);
+				return;
+			}
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + soqlStdout);
+		} catch(err) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
+		}
 	}
 
 	async function openWorkbench(orgAlias: String) {
@@ -163,6 +209,11 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage('' + err);
 		}
 	}
+
+	// soqlQueryAll
+	vscode.commands.registerCommand('extension.soqlQueryAll', () => {
+		vscode.window.setStatusBarMessage('Pflaumen SFDX: Running SOQL...', soqlQueryAll());
+	});
 
 	// openWorkbench
 	vscode.commands.registerCommand('extension.openWorkbench', () => {
