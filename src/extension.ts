@@ -20,49 +20,67 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(false));
 	}
 
-	async function soqlQueryAll() {
+	async function soqlQueryAll(resFileName: String | undefined) {
 		try {
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: starting...');
 			let editor = vscode.window.activeTextEditor;
 			let selection = editor?.selection;
 			let text = editor?.document.getText(selection).toUpperCase();
 			if(text?.match(/SELECT.*FROM.*/) === null) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Invalid string: '+text);
+				vscode.window.showInformationMessage('Pflaumen SFDX: Invalid string <'+text+'>');
 				return;
 			}
 			let afterFrom = text?.split('FROM')[1];
 			let objName = afterFrom?.split('WHERE')[0].trim();
 			let qualifiers = afterFrom?.split('WHERE')[1]?.trim();
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Received: '+objName+' '+qualifiers);
-			let fullApexCode = 'echo "String sObjectName = \''+objName+'\';'+code+'"';
-			let runTmpApexCmd = fullApexCode+' | sfdx force:apex:execute | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: running ' + runTmpApexCmd);
-			const { runStdout, runStderr } = await exec(runTmpApexCmd, { cwd: fsPath });
-			if(runStderr) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: error:' + runStderr);
+			let runTmpApexCmd = 'echo "String sObjectName = \''+objName+'\';'+code+'" | sfdx force:apex:execute -u jstone.ryan@wmp.com.uat | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
+			let fieldResponse = await callExec(runTmpApexCmd);
+			if(fieldResponse.status === 'error') {
 				return;
 			}
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + runStdout);
-			let sObjectFields = JSON.parse(runStdout);
+			let sObjectFields = JSON.parse(fieldResponse.message);
 			let dynamicSoqlQuery = 'SELECT ';
-			for(let field in sObjectFields[objName!]) {
-				dynamicSoqlQuery += field + ', ';
+			for(let key in sObjectFields[objName!]) {
+				dynamicSoqlQuery += sObjectFields[objName!][key] + ',';
 			}
 			dynamicSoqlQuery = dynamicSoqlQuery.slice(0, -1);
 			dynamicSoqlQuery += ' FROM '+objName;
 			if(qualifiers) {
 				dynamicSoqlQuery += ' WHERE '+qualifiers;
 			}
-			let runSoqlCmd = 'sfdx force:data:soql:query -q "'+dynamicSoqlQuery+'"';
-			const { soqlStdout, soqlStderr } = await exec(runSoqlCmd, { cwd: fsPath });
-			if(soqlStderr) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + soqlStderr);
+			let runSoqlCmd = 'sfdx force:data:soql:query -q "'+dynamicSoqlQuery+'" -r=csv';
+			let queryResponse = await callExec(runSoqlCmd);
+			if(queryResponse.status === 'error') {
+				vscode.window.showInformationMessage('Pflaumen SFDX: Errors during query <'+queryResponse.message+'>');
 				return;
 			}
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + soqlStdout);
+			if(resFileName) {
+				let writeFileCmd = 'echo "'+queryResponse.message+'" > '+resFileName+'.csv';
+				let writeResponse = await callExec(writeFileCmd);
+				if(writeResponse.status === 'error') {
+					vscode.window.showInformationMessage('Pflaumen SFDX: Errors writing file <'+queryResponse.message+'>');
+					return;
+				}
+			} else {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + queryResponse.message);
+			}
+			vscode.window.showInformationMessage('Pflaumen SFDX: Done');
 		} catch(err) {
-			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
+			vscode.window.showInformationMessage('Pflaumen SFDX: Error '+err);
 		}
+	}
+
+	async function callExec(command: String) {
+		let { stdout, stderr } = await exec(command, { cwd: fsPath });
+		if(stderr) {
+			return {
+				"status": "error",
+				"message": stderr
+			};
+		}
+		return {
+			"status": "success",
+			"message": stdout
+		};
 	}
 
 	async function openWorkbench(orgAlias: String) {
@@ -212,7 +230,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// soqlQueryAll
 	vscode.commands.registerCommand('extension.soqlQueryAll', () => {
-		vscode.window.setStatusBarMessage('Pflaumen SFDX: Running SOQL...', soqlQueryAll());
+		vscode.window.showInputBox({ 
+			placeHolder: 'Name of file to push results to (blank to push to Terminal)', 
+			prompt: 'File Name' 
+		}).then(name => {
+			vscode.window.showInformationMessage('Pflaumen SFDX: Running SOQL...');
+			vscode.window.setStatusBarMessage('Pflaumen SFDX: Running SOQL...', soqlQueryAll(name));
+		});
 	});
 
 	// openWorkbench
