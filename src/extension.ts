@@ -20,6 +20,36 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.setStatusBarMessage('Pflaumen SFDX: Refreshing Org List...', getOrgList(false));
 	}
 
+	async function getAllFields(sObjectName: string, printToTerminal: Boolean) {
+		if(sObjectName.length === 0) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Error: 0 length string received');
+			infoMessageFail();
+			return;
+		}
+		let runTmpApexCmd = 'echo "String sObjectName = \''+sObjectName+'\';'+code+'" | sfdx force:apex:execute | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
+		let fieldResponse = await callExec(runTmpApexCmd);
+		if(fieldResponse.status === 'error') {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+fieldResponse.message);
+			return;
+		}
+		let sObjectFields = JSON.parse(fieldResponse.message);
+		if(sObjectFields.message) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+sObjectFields.message);
+			infoMessageFail();
+			return;
+		}
+		if(printToTerminal) {
+			let fieldList = '';
+			for(let key in sObjectFields[sObjectName!]) {
+				fieldList += sObjectFields[sObjectName!][key] + ',';
+			}
+			fieldList = fieldList.slice(0, -1);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+fieldList);
+			vscode.window.showInformationMessage('Pflaumen SFDX: Done');
+		}
+		return sObjectFields;
+	}
+
 	async function soqlQueryAll(resFileName: String | undefined) {
 		try {
 			let editor = vscode.window.activeTextEditor;
@@ -32,24 +62,9 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			let afterFrom = text?.split('FROM')[1];
 			let objName = afterFrom?.split('WHERE')[0].trim();
-			if(!objName || objName.length === 0) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Invalid string <'+text+'>');
-				infoMessageFail();
-				return;
-			}
 			let qualifiers = afterFrom?.split('WHERE')[1]?.trim();
-			let runTmpApexCmd = 'echo "String sObjectName = \''+objName+'\';'+code+'" | sfdx force:apex:execute | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
-			let fieldResponse = await callExec(runTmpApexCmd);
-			if(fieldResponse.status === 'error') {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+fieldResponse.message);
-				return;
-			}
-			let sObjectFields = JSON.parse(fieldResponse.message);
-			if(sObjectFields.message) {
-				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+sObjectFields.message);
-				infoMessageFail();
-				return;
-			}
+			let sObjectFields = await getAllFields(objName!, false);
+			if(!sObjectFields) { return; }
 			let dynamicSoqlQuery = 'SELECT ';
 			for(let key in sObjectFields[objName!]) {
 				dynamicSoqlQuery += sObjectFields[objName!][key] + ',';
@@ -247,6 +262,21 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage('' + err);
 		}
 	}
+
+	vscode.commands.registerCommand('extension.getSObjectFields', () => {
+		vscode.window.showInputBox({
+			placeHolder: 'Name of sObject to retrieve field metadata for',
+			prompt: 'sObject Name'
+		}).then(name => {
+			if(name && name.length > 0) {
+				vscode.window.showInformationMessage('Pflaumen SFDX: Retrieving fields...');
+				vscode.window.setStatusBarMessage('Pflaumen SFDX: Retrieving fields...', getAllFields(name, true));
+			} else {
+				vscode.window.showInformationMessage('Pflaumen SFDX: Error');
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Error: 0 length string received');
+			}
+		});
+	});
 
 	// soqlQueryAll
 	vscode.commands.registerCommand('extension.soqlQueryAll', () => {
