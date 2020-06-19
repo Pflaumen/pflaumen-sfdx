@@ -38,12 +38,18 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 			let qualifiers = afterFrom?.split('WHERE')[1]?.trim();
-			let runTmpApexCmd = 'echo "String sObjectName = \''+objName+'\';'+code+'" | sfdx force:apex:execute -u jstone.ryan@wmp.com.uat | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
+			let runTmpApexCmd = 'echo "String sObjectName = \''+objName+'\';'+code+'" | sfdx force:apex:execute | grep --line-buffered "USER_DEBUG" | echo "{$(cut -d "{" -f2-)"';
 			let fieldResponse = await callExec(runTmpApexCmd);
 			if(fieldResponse.status === 'error') {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+fieldResponse.message);
 				return;
 			}
 			let sObjectFields = JSON.parse(fieldResponse.message);
+			if(sObjectFields.message) {
+				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: '+sObjectFields.message);
+				infoMessageFail();
+				return;
+			}
 			let dynamicSoqlQuery = 'SELECT ';
 			for(let key in sObjectFields[objName!]) {
 				dynamicSoqlQuery += sObjectFields[objName!][key] + ',';
