@@ -42,6 +42,18 @@ Runs [Cleanup Source](https://github.com/dmgerow/sfdx-dmg-plugin#sfdx-dmgsourcec
 
 2. Runs `sfdx force:auth:logout -u {orgAlias}` upon selection
 
+### Pflaumen SFDX: Get Fields from sObject
+Enter a valid sObject API name, and the extension will print all fields to the Output channel in VSCode.
+
+<img src="images/getSObjectFields.png" width="500px" />
+
+### Pflaumen SFDX: SOQL Select * on Highlighted Text
+Dynamically builds a SOQL query for all fields in an object, then returns the results.
+
+You may specify a file name to export the search to a CSV, or leave it blank to have the results posted into the Output channel in VSCode.
+
+<img src="images/selectStar.png" width="500px" />
+
 ## Invocation Methods
 
 #### Command Palette (Cmd + Shift + P)
