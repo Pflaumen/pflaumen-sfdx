@@ -96,7 +96,7 @@
 				}
 			]
 		},
-		"configurations": {
+		"configuration": {
 			"title": "Pflaumen SFDX",
 			"type": "object",
 			"properties": {
