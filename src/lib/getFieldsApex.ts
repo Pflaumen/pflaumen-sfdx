@@ -1,0 +1,3 @@
+const code = 'Map<String,List<String>> jsonHack = new Map<String,List<String>>();Schema.SObjectType objectSchema = Schema.getGlobalDescribe().get(sObjectName);if(objectSchema == null) {System.debug(JSON.serialize(new Map<String, String> { \'message\' => \'Error getting describe for sObject: \'+sObjectName })); return;}jsonHack.put(sObjectName, new List<String>());Map<String, Schema.SObjectField> fieldMap = objectSchema.getDescribe().fields.getMap();for(Schema.SObjectField field : fieldMap.values()) {Schema.DescribeFieldResult dfr = field.getDescribe();jsonHack.get(sObjectName).add(dfr.getName());}System.debug(JSON.serialize(jsonHack));';
+
+export { code };
