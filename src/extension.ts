@@ -54,15 +54,19 @@ export function activate(context: vscode.ExtensionContext) {
 		try {
 			let editor = vscode.window.activeTextEditor;
 			let selection = editor?.selection;
-			let text = editor?.document.getText(selection).toUpperCase();
-			if(text?.match(/SELECT.*FROM.*/) === null) {
+			let text = editor?.document.getText(selection);
+			if(text?.match(/SELECT.*FROM.*/i) === null) {
 				vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Invalid string <'+text+'>');
 				infoMessageFail();
 				return;
 			}
-			let afterFrom = text?.split('FROM')[1];
-			let objName = afterFrom?.split('WHERE')[0].trim();
-			let qualifiers = afterFrom?.split('WHERE')[1]?.trim();
+			let afterFrom = text?.split(/FROM/i)[1].trim();
+			let objName = afterFrom?.split(' ')[0].trim();
+			let qualifierTokens = afterFrom?.split(' ');
+			let qualifiers = ' ';
+			for(let tokenIndex = 1; tokenIndex < qualifierTokens!.length; tokenIndex++) {
+				qualifiers += qualifierTokens![tokenIndex] + ' ';
+			}
 			let sObjectFields = await getAllFields(objName!, false);
 			if(!sObjectFields) { return; }
 			let dynamicSoqlQuery = 'SELECT ';
@@ -71,8 +75,8 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			dynamicSoqlQuery = dynamicSoqlQuery.slice(0, -1);
 			dynamicSoqlQuery += ' FROM '+objName;
-			if(qualifiers) {
-				dynamicSoqlQuery += ' WHERE '+qualifiers;
+			if(qualifiers.length > 1) {
+				dynamicSoqlQuery += qualifiers;
 			}
 			let runSoqlCmd = 'sfdx force:data:soql:query -q "'+dynamicSoqlQuery+'" -r=csv';
 			let queryResponse = await callExec(runSoqlCmd);
@@ -82,8 +86,9 @@ export function activate(context: vscode.ExtensionContext) {
 				return;
 			}
 			if(resFileName) {
+				let strippedPossibleExtension = resFileName.split(/\.csv/i)[0];
 				let escapedMessage = queryResponse.message.replace(/'/g, '\\\'').replace(/"/g, '\\"');
-				let writeFileCmd = 'echo "'+escapedMessage+'" > '+resFileName+'.csv';
+				let writeFileCmd = 'echo "'+escapedMessage+'" > '+strippedPossibleExtension+'.csv';
 				let writeResponse = await callExec(writeFileCmd);
 				if(writeResponse.status === 'error') {
 					vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Errors writing file <'+queryResponse.message+'>');
