@@ -285,9 +285,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// soqlQueryAll
 	vscode.commands.registerCommand('extension.soqlQueryAll', () => {
-		vscode.window.showInputBox({ 
-			placeHolder: 'Name of file to push results to (blank to push to Terminal)', 
-			prompt: 'File Name' 
+		vscode.window.showInputBox({
+			placeHolder: 'Name of file to push results to (blank to push to Terminal)',
+			prompt: 'File Name'
 		}).then(name => {
 			vscode.window.showInformationMessage('Pflaumen SFDX: Running SOQL...');
 			vscode.window.setStatusBarMessage('Pflaumen SFDX: Running SOQL...', soqlQueryAll(name));
@@ -339,6 +339,46 @@ export function activate(context: vscode.ExtensionContext) {
 	vscode.commands.registerCommand('extension.cleanup', () => {
 		vscode.window.setStatusBarMessage('Pflaumen SFDX: Cleaning Up...', cleanup());
 	});
+
+	// track metadata
+	vscode.commands.registerCommand('extension.trackMetadata', () => {
+		vscode.window.showInformationMessage('Pflaumen SFDX: Running Track Metadata...');
+		vscode.window.showInputBox({
+			placeHolder: 'CustomObject, Layout, etc.',
+			prompt: 'Metadata Type'
+		}).then(metadataType => {
+			if(!metadataType) {
+				return;
+			}
+			vscode.window.setStatusBarMessage('Pflaumen SFDX: Tracking Metadata...', promptForFileName(metadataType));
+		});
+	});
+
+	async function promptForFileName(metadataType: string | undefined) {
+		vscode.window.showInputBox({
+			placeHolder: 'API name of the file to track.',
+			prompt: 'File Name'
+		}).then(fileName => {
+			if(!fileName) {
+				return;
+			}
+			trackMetadata(metadataType, fileName);
+		});
+	}
+
+	async function trackMetadata(metadataType:string | undefined, fileName:string | undefined) {
+		try {
+			const externalId = metadataType + '|' + fileName;
+			const combinedCommand = 'sfdx force:data:record:create -s MDTKR__MetadataFile__c -v "Name='+fileName+' MDTKR__ExternalId__c='+externalId +' MDTKR__Type__c='+metadataType+'"';
+			console.log('combinedCommand: '+combinedCommand);
+			const { stdout, stderr } = await exec(combinedCommand, { cwd: fsPath });
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Tracking Metadata Finished');
+		} catch (err) {
+			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + err);
+			vscode.window.showErrorMessage('' + err);
+		}
+	}
 
 	// appendToOutputChannel
 	context.subscriptions.push(vscode.commands.registerCommand('extension.appendToOutputChannel', (message) => {
