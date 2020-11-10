@@ -23,6 +23,7 @@
 		"onCommand:extension.soqlQueryAll",
 		"onCommand:extension.openWorkbench",
 		"onCommand:extension.retrieveSource",
+		"onCommand:extension.trackMetadata",
 		"onCommand:extension.signOut",
 		"onCommand:extension.cleanup",
 		"workspaceContains:sfdx-project.json"
@@ -69,6 +70,10 @@
 			{
 				"command": "extension.cleanup",
 				"title": "P SFDX: Cleanup"
+			},
+			{
+				"command": "extension.trackMetadata",
+				"title": "P SFDX: Track Metadata"
 			}
 		],
 		"menus": {
