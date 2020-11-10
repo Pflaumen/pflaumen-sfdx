@@ -369,7 +369,7 @@ export function activate(context: vscode.ExtensionContext) {
 	async function trackMetadata(metadataType:string | undefined, fileName:string | undefined) {
 		try {
 			const externalId = metadataType + '|' + fileName;
-			const combinedCommand = 'sfdx force:data:record:create -s MDTKR__MetadataFile__c -v "Name='+fileName+' MDTKR__ExternalId__c='+externalId +' MDTKR__Type__c='+metadataType+'"';
+			const combinedCommand = `sfdx force:data:record:create -s MDTKR__MetadataFile__c -v "Name='`+fileName+`' MDTKR__ExternalId__c='`+externalId +`' MDTKR__Type__c=`+metadataType+`"`;
 			console.log('combinedCommand: '+combinedCommand);
 			const { stdout, stderr } = await exec(combinedCommand, { cwd: fsPath });
 			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
