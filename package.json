@@ -56,6 +56,7 @@
 				}
 			},
 			{
+				"when": "false",
 				"command": "extension.retrieveSource",
 				"title": "P SFDX: Retrieve Source",
 				"icon": {

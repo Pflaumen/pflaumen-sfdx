@@ -225,10 +225,10 @@ export function activate(context: vscode.ExtensionContext) {
 		globalState.update('combinedList', combinedList);
 	}
 
-	async function retrieveSource() {
+	async function retrieveSource(uri:vscode.Uri) {
 		vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Retrieving Source...');
 		try {
-			let command = 'sfdx dmg:source:retrieve -x ./manifest/package.xml';
+			let command = 'sfdx dmg:source:retrieve -x ./manifest/' + uri.fsPath.replace(/^.*[\\\/]/, '');
 			const { stdout, stderr } = await exec(command, { cwd: fsPath });
 			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: ' + stdout);
 			vscode.commands.executeCommand('extension.appendToOutputChannel', 'Pflaumen SFDX: Retrieving Source Finished');
@@ -313,8 +313,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	// retrieveSource
-	vscode.commands.registerCommand('extension.retrieveSource', () => {
-		vscode.window.setStatusBarMessage('Pflaumen SFDX: Retrieving Source...', retrieveSource());
+	vscode.commands.registerCommand('extension.retrieveSource', (uri:vscode.Uri) => {
+		vscode.window.setStatusBarMessage('Pflaumen SFDX: Retrieving Source...', retrieveSource(uri));
 	});
 
 	// signOut
