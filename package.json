@@ -10,7 +10,7 @@
 		"type": "git",
 		"url": "https://github.com/Pflaumen/sfdx.git"
 	},
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"engines": {
 		"vscode": "^1.41.0"
 	},
@@ -80,14 +80,14 @@
 		"menus": {
 			"editor/context": [
 				{
-					"when": "resourceFilename =~ /package.xml/",
+					"when": "resourceDirname =~ /manifest/",
 					"command": "extension.retrieveSource",
 					"group": "z_PSFDX@1"
 				}
 			],
 			"explorer/context": [
 				{
-					"when": "resourceFilename =~ /package.xml/",
+					"when": "resourceDirname =~ /manifest/",
 					"command": "extension.retrieveSource",
 					"group": "z_PSFDX@1"
 				}
@@ -97,7 +97,7 @@
 					"command": "extension.openWorkbench"
 				},
 				{
-					"when": "resourceFilename =~ /package.xml/",
+					"when": "resourceDirname =~ /manifest/",
 					"command": "extension.retrieveSource"
 				}
 			]
